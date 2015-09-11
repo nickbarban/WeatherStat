@@ -1,0 +1,15 @@
+# Maven
+target
+
+# Eclipse
+.project
+.settings
+.classpath
+
+# Idea
+budgetrush.iml
+.idea
+
+# Spring
+.springBeans
+
