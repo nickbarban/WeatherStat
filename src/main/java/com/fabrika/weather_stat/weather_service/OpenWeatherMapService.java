@@ -32,7 +32,6 @@ public class OpenWeatherMapService implements WeatherService {
         Weather weather = new Weather();
         weather.setCity(city);
         weather.setTemp(temp);
-        weather.setTime(System.currentTimeMillis());
         return weather;
     }
 

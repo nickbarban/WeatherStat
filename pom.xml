@@ -23,7 +23,7 @@
 		<junit.test>4.12</junit.test>
 		<h2.version>1.4.188</h2.version>
 		<mysql.version>5.1.36</mysql.version>
-		<guava.version>12.0</guava.version>
+		<guava.version>18.0</guava.version>
 		<hibernate-jpa.version>1.0.0.Final</hibernate-jpa.version>
 		<hibernate-entitymanager.version>5.0.0.Final</hibernate-entitymanager.version>
 		<lombok.version>1.16.6</lombok.version>
@@ -34,6 +34,7 @@
 		<jsp-api.version>2.2.1-b03</jsp-api.version>
 		<jstl.version>1.2</jstl.version>
 		<jackson.version>2.6.1</jackson.version>
+		<jedis.version>2.7.3</jedis.version>
 	</properties>
 
 	<dependencies>
@@ -196,6 +197,13 @@
 			<artifactId>jackson-annotations</artifactId>
 			<version>${jackson.version}</version>
 		</dependency>
+		
+		<!-- Redis -->
+		<dependency>
+	<groupId>redis.clients</groupId>
+	<artifactId>jedis</artifactId>
+	<version>${jedis.version}</version>
+</dependency>
 
 	</dependencies>
 
