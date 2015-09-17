@@ -12,7 +12,7 @@ import com.fabrika.weather_stat.weather_service.OpenWeatherMapService;
 import com.google.common.base.Preconditions;
 
 @Slf4j
-public final class CacheRedisServiceImpl {
+public final class RedisDAO {
 
 	/**
 	 * Provides add and get operations with Redis cache
@@ -24,7 +24,7 @@ public final class CacheRedisServiceImpl {
 	
 	// if cache contains not expired weather for asked city so method returns new weather object from saved data
 	// else it returns null
-	public static Weather checkWeather(City city) {
+	public synchronized static Weather checkWeather(City city) {
 		Preconditions.checkNotNull(city);
 		String key = "weather:" + city.getName() + city.getCountry();
 		Weather result = null;
@@ -40,7 +40,7 @@ public final class CacheRedisServiceImpl {
 	// returns OK if adding and setting timeout is successful
 	// returns NOK if adding and setting timeout is UNsuccessful
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public static String addNewWeather(Weather weather) {
+	public synchronized static String addNewWeather(Weather weather) {
 		Preconditions.checkNotNull(weather);
 		Preconditions.checkNotNull(weather.getCity());
 		Preconditions.checkNotNull(weather.getCity().getName());
@@ -57,7 +57,7 @@ public final class CacheRedisServiceImpl {
 				addResult = "NOK";
 			}
 		}		
-		log.info(CacheRedisServiceImpl.class.getName() + 
+		log.info(RedisDAO.class.getName() + 
 				": add new weather to REDIS hash: " + key + 
 				" ; result: " + addResult);
 		return addResult;
@@ -82,7 +82,7 @@ public final class CacheRedisServiceImpl {
 				result = null;
 			}
 		}
-		log.info(CacheRedisServiceImpl.class.getName() + 
+		log.info(RedisDAO.class.getName() + 
 				": get weather from REDIS hash: " + key + 
 				" ; result: " + result);
 		return result;
