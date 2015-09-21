@@ -7,8 +7,6 @@ import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 
 import com.fabrika.weather_stat.data.City;
-import com.fabrika.weather_stat.data.Weather;
-import com.fabrika.weather_stat.weather_service.OpenWeatherMapService;
 import com.google.common.base.Preconditions;
 
 @Slf4j
@@ -20,14 +18,14 @@ public final class RedisDAO {
 	 */
 	
 	// timeout in seconds
-	public static int DATA_LIFE_TIME = 30;
+	public int DATA_LIFE_TIME = 0;
 	
 	// if cache contains not expired weather for asked city so method returns new weather object from saved data
 	// else it returns null
-	public synchronized static Weather checkWeather(City city) {
+	public synchronized City checkWeather(City city) {
 		Preconditions.checkNotNull(city);
-		String key = "weather:" + city.getName() + city.getCountry();
-		Weather result = null;
+		String key = "weather:" + city.getId() + city.getCountry();
+		City result = null;
 		if (RedisService.isExpired(key) > 0) {
 			result = getWeather(city);
 		} 
@@ -40,17 +38,19 @@ public final class RedisDAO {
 	// returns OK if adding and setting timeout is successful
 	// returns NOK if adding and setting timeout is UNsuccessful
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public synchronized static String addNewWeather(Weather weather) {
-		Preconditions.checkNotNull(weather);
-		Preconditions.checkNotNull(weather.getCity());
-		Preconditions.checkNotNull(weather.getCity().getName());
-		Preconditions.checkNotNull(weather.getCity().getCountry());
-		Preconditions.checkNotNull(weather.getTemp());
-		Preconditions.checkArgument(weather.getCity().getName().length() > 0);
-		Preconditions.checkArgument(weather.getCity().getCountry().length() > 0);
+	public synchronized String addNewWeather(City city) {
+		Preconditions.checkNotNull(city);
+		Preconditions.checkNotNull(city.getName());
+		Preconditions.checkNotNull(city.getCountry());
+		Preconditions.checkNotNull(city.getTemp());
+		Preconditions.checkArgument(city.getName().length() > 0);
+		Preconditions.checkArgument(city.getCountry().length() > 0);
 		Map<String, String> values = new HashMap();
-		values.put("temp", weather.getTemp().toString());
-		String key = "weather:" + weather.getCity().getName() + weather.getCity().getCountry();
+		values.put("name", city.getName());
+		values.put("country", city.getCountry());
+		values.put("temp", city.getTemp().toString());
+		values.put("time", String.valueOf(System.currentTimeMillis()));
+		String key = "weather:" + city.getId();
 		String addResult =  RedisService.add(key, values);
 		if (addResult.equalsIgnoreCase("OK")) {
 			if (RedisService.setExpire(key, DATA_LIFE_TIME) != 1) {
@@ -66,26 +66,26 @@ public final class RedisDAO {
 	// if cache containes weather with specified city so method gets data from cache 
 	// ans creates new weather object form the data
 	// if cache does not contains weather with specified city so method returns null
-	private static Weather getWeather(City city) {
+	private City getWeather(City city) {
 		Preconditions.checkNotNull(city);
 		Preconditions.checkNotNull(city.getName());
 		Preconditions.checkNotNull(city.getCountry());
-		String key = "weather:" + city.getName() + city.getCountry();
+		Preconditions.checkArgument(city.getId() != 0);
+		String key = "weather:" + city.getId();
 		Map<String, String> values = RedisService.getAll(key);
-		Weather result = null;
+		//City result = null;
 		if (values != null && values.size() > 0) {
-			result = new Weather();
-			result.setCity(city);
 			try {
-				result.setTemp(BigDecimal.valueOf(Double.parseDouble(values.get("temp"))));
+				city.setTemp(BigDecimal.valueOf(Double.parseDouble(values.get("temp"))));
+				city.setTemp(BigDecimal.valueOf(Double.parseDouble(values.get("time"))));
 			} catch (NumberFormatException e) {
-				result = null;
+				city = null;
 			}
 		}
 		log.info(RedisDAO.class.getName() + 
 				": get weather from REDIS hash: " + key + 
-				" ; result: " + result);
-		return result;
+				" ; result: " + city);
+		return city;
 	}
 	
 	

@@ -1,5 +1,7 @@
 package com.fabrika.weather_stat.data;
 
+import java.math.BigDecimal;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -21,4 +23,8 @@ public class City {
     private String name;
 
     private String country;
+    
+    private BigDecimal temp;
+
+    private Long time;
 }

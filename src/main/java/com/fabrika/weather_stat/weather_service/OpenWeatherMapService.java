@@ -5,13 +5,12 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Map;
 
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.web.client.RestTemplate;
 
 import com.fabrika.weather_stat.data.City;
-import com.fabrika.weather_stat.data.Weather;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class OpenWeatherMapService implements WeatherService {
@@ -21,18 +20,16 @@ public class OpenWeatherMapService implements WeatherService {
     }
 
     @Override
-    public Weather getWeather(City city) {
+    public City getWeather(City city) {
 
         RestTemplate restTemplate = new RestTemplate();
         String jsonResult = restTemplate.getForObject(getURL(city), String.class);
         Map<String, Object> userData = getJsonMap(jsonResult);
 
         BigDecimal temp = findTemp(userData);
-
-        Weather weather = new Weather();
-        weather.setCity(city);
-        weather.setTemp(temp);
-        return weather;
+        
+        city.setTemp(temp);
+        return city;
     }
 
     private BigDecimal findTemp(Map<String, Object> userData) {

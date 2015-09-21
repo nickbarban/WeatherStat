@@ -10,6 +10,8 @@ import javax.annotation.Resource;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
+import lombok.extern.slf4j.Slf4j;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -23,9 +25,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.fabrika.weather_stat.base_service.WeatherBaseService;
 import com.fabrika.weather_stat.config.H2Config;
 import com.fabrika.weather_stat.data.City;
-import com.fabrika.weather_stat.data.Weather;
-
-import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @DirtiesContext
@@ -46,26 +45,26 @@ public class WeatherTest {
         em = emf.createEntityManager();
     }
 
-    private Weather saveTestWeather() {
+    private City saveTestWeather() {
         City city = new City();
         city.setName("Odessa");
         city.setCountry("UA");
-        Weather weather = new Weather();
-        weather.setCity(city);
-        weather.setTemp(new BigDecimal(19.38));
+        city.setId(1);
+        city.setTemp(new BigDecimal(19.38));
         //weather.setTime(System.currentTimeMillis());
-        return service.save(weather);
+        return service.save(city);
     }
 
     @Test
     @Transactional
     public void saveWetherTest() throws Exception {
 
-        Weather weather = saveTestWeather();
-        log.info("Save city " + weather.toString());
+        City city = saveTestWeather();
+        log.info("Save city " + city.toString());
         //assertNotNull(weather.getId());
-        assertNotNull(weather.getCity());
-        assertNotNull(weather.getTemp());
+        assertNotNull(city.getName());
+        assertNotNull(city.getCountry());
+        assertNotNull(city.getTemp());
     }
 
     @Test
@@ -74,8 +73,10 @@ public class WeatherTest {
         int size = service.getAll().size();
         log.info("Table size " + size);
         saveTestWeather();
-        List<Weather> weathers = service.getAll();
-        log.info("Table size " + weathers.size());
-        assertNotEquals(size, weathers.size());
+        List<City> cities = service.getAll();
+        log.info("Table size " + cities.size());
+        assertNotEquals(size, cities.size());
     }
+    
+    
 }

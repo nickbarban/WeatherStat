@@ -2,14 +2,14 @@ package com.fabrika.weather_stat.base_service;
 
 import java.util.List;
 
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.fabrika.weather_stat.data.Weather;
+import com.fabrika.weather_stat.data.City;
 import com.fabrika.weather_stat.repository.WeatherRepository;
-
-import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
@@ -19,12 +19,12 @@ public class WeatherBaseService {
     @Autowired
     private WeatherRepository repository;
 
-    public Weather save(Weather weather) {
-        log.info("Save weather " + weather);
-        return repository.saveAndFlush(weather);
+    public City save(City city) {
+        log.info("Save weather " + city);
+        return repository.saveAndFlush(city);
     }
 
-    public List<Weather> getAll() {
+    public List<City> getAll() {
         log.info("Get all weather");
         return repository.findAll();
     }

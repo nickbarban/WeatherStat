@@ -1,6 +1,10 @@
 package com.fabrika.weather_stat.controllers;
 
+import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
+
+import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -13,11 +17,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.fabrika.weather_stat.base_service.WeatherBaseService;
 import com.fabrika.weather_stat.config.H2Config;
 import com.fabrika.weather_stat.data.City;
-import com.fabrika.weather_stat.data.Weather;
 import com.fabrika.weather_stat.weather_service.OpenWeatherMapService;
 import com.fabrika.weather_stat.weather_service.WeatherService;
-
-import lombok.extern.slf4j.Slf4j;
+import com.fabrika.weather_stat.redis.RedisDAO;
 
 @Slf4j
 @Controller
@@ -26,10 +28,13 @@ public class WeatherController {
 
     @Autowired
     private WeatherBaseService baseService;
+    
+    private RedisDAO redisDAO = new RedisDAO();
 
-    @RequestMapping(value = "/weather", method = RequestMethod.POST)
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+	@RequestMapping(value = "/weather", method = RequestMethod.POST)
     @ResponseBody
-    public List<Weather> saveWeather(@RequestBody City[] cities) {
+    public List<City> saveWeatherToBaseService(@RequestBody City[] cities) {
         log.info("Start servlet");
 
         WeatherService service = new OpenWeatherMapService();
@@ -40,6 +45,22 @@ public class WeatherController {
         }
 
         return baseService.getAll();
+    }
+    
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+	@RequestMapping(value = "/weather", method = RequestMethod.POST)
+    @ResponseBody
+    public List<City> saveWeatherToCache(@RequestBody City[] cities) {
+        log.info("Start servlet");
+
+        redisDAO.DATA_LIFE_TIME = 30;
+
+        for (City city : cities) {
+            log.info("Start to get weather from redis server for city " + city.getName());
+            city = redisDAO.checkWeather(city);
+        }        
+
+        return new LinkedList(Arrays.asList(cities));
     }
 
 }
