@@ -21,7 +21,7 @@
 		<maven-compiler-plugin.version>3.3</maven-compiler-plugin.version>
 		<spring.test>3.2.4.RELEASE</spring.test>
 		<junit.test>4.12</junit.test>
-		<h2.version>1.4.188</h2.version>
+		<h2.version>2.1.210</h2.version>
 		<mysql.version>5.1.36</mysql.version>
 		<guava.version>18.0</guava.version>
 		<hibernate-jpa.version>1.0.0.Final</hibernate-jpa.version>
